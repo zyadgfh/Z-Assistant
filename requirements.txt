@@ -1,0 +1,6 @@
+# Core voice assistant dependencies
+SpeechRecognition==3.16.0
+PyAudio==0.2.14
+PyAutoGUI==0.9.54
+pywhatkit==5.4
+ollama==0.6.1
