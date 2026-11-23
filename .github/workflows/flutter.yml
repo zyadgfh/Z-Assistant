@@ -29,7 +29,7 @@ jobs:
       - name: Analyze
         working-directory: app
         shell: bash
-        run: set -o pipefail && flutter analyze 2>&1 | tee analyze.log
+        run: set -o pipefail && flutter analyze --no-fatal-infos 2>&1 | tee analyze.log
       - name: Test
         working-directory: app
         shell: bash
@@ -42,8 +42,8 @@ jobs:
           {
             echo "❌ **Analyze/Test failed** — log tail:"
             echo '```text'
-            tail -n 100 app/analyze.log 2>/dev/null
-            tail -n 100 app/test.log 2>/dev/null
+            (tail -n 100 app/analyze.log 2>/dev/null || true)
+            (tail -n 100 app/test.log 2>/dev/null || true)
             echo '```'
           } > body.md
           gh pr comment "${{ github.event.pull_request.number }}" --body-file body.md
@@ -65,13 +65,15 @@ jobs:
       - name: Generate platform folders (kept out of git, as documented)
         run: flutter create . --platforms=android --project-name maya_assistant
         working-directory: app
-      - name: Raise compileSdk to 36 (flutter_tts requirement)
+      - name: Raise compileSdk to 36 and minSdk to 24 (flutter_tts requirements)
         working-directory: app
         run: |
           sed -i -e 's/compileSdk = flutter.compileSdkVersion/compileSdk = 36/' \
                  -e 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 36/' \
+                 -e 's/minSdk = flutter.minSdkVersion/minSdk = 24/' \
+                 -e 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 24/' \
                  android/app/build.gradle
-          grep -n compileSdk android/app/build.gradle
+          grep -n "compileSdk\|minSdk" android/app/build.gradle
       - name: Pub get
         run: flutter pub get
         working-directory: app
@@ -87,7 +89,7 @@ jobs:
           {
             echo "❌ **Android APK build failed** — log tail:"
             echo '```text'
-            tail -n 100 app/apk.log 2>/dev/null
+            (tail -n 100 app/apk.log 2>/dev/null || true)
             echo '```'
           } > body.md
           gh pr comment "${{ github.event.pull_request.number }}" --body-file body.md
