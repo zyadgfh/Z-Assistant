@@ -1,0 +1,17 @@
+# انسخ هذا الملف إلى wrangler.toml ثم عدّل القيم.
+# لا تضع أي مفتاح API هنا أو في أي ملف يُرفع إلى Git — استخدم `wrangler secret put`.
+
+name = "maya-assistant-worker"
+main = "src/index.ts"
+compatibility_date = "2026-01-15"
+
+[vars]
+# نطاقات مسموحة لـ CORS مفصولة بفواصل؛ لا تستخدم "*" في الإنتاج.
+ALLOWED_ORIGINS = "http://localhost:3000,https://your-domain.example"
+# السقف اليومي للطلبات لكل عنوان IP.
+DAILY_REQUEST_LIMIT = "200"
+# النموذج المستخدم.
+GEMINI_MODEL = "gemini-2.5-flash"
+
+# السر يُضبط من سطر الأوامر فقط (لا يظهر في أي ملف):
+#   wrangler secret put GEMINI_API_KEY

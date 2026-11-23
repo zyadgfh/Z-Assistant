@@ -23,6 +23,12 @@ screenshots/
 logs/
 *.log
 
+# Flutter / Dart
+.dart_tool/
+build/
+.flutter-plugins*
+*.iml
+
 # IDE/OS
 .vscode/
 .idea/
