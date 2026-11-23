@@ -45,19 +45,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _save() async {
+    // Capture dependencies BEFORE the async gap (use_build_context_synchronously).
+    final holder = context.read<BackendUrlHolder>();
+    final messenger = ScaffoldMessenger.of(context);
+
     // SecretStorage refuses credential-like keys by design.
     final url = _backendController.text.trim();
     final saved = await _storage.tryStorePublicValue(AppConfig.prefBackendUrl, url);
     if (saved) {
       // Apply immediately without an app restart.
-      context.read<BackendUrlHolder>().url = url;
+      holder.url = url;
     }
     await widget.prefs.setString(AppConfig.prefLanguage, _language);
     await widget.prefs.setDouble(AppConfig.prefTtsRate, _rate);
     await widget.prefs.setDouble(AppConfig.prefTtsPitch, _pitch);
     await widget.prefs.setBool(AppConfig.prefAutostart, _autostart);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      messenger.showSnackBar(
         SnackBar(content: Text(saved ? 'حُفظت الإعدادات.' : 'رُفض حفظ قيمة تشبه بيانات سرية.')),
       );
     }

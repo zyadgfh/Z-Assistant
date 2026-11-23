@@ -14,7 +14,9 @@ dependencies:
   shared_preferences: ^2.3.3
   connectivity_plus: ^6.1.0
   speech_to_text: ^6.6.2
-  flutter_tts: ^4.1.0
+  # Pinned exact: 4.2.x ships Kotlin metadata 2.2 which the default Flutter
+  # 3.27 Android template (Kotlin 1.8.22) cannot compile.
+  flutter_tts: 4.1.0
   url_launcher: ^6.3.1
 
 dev_dependencies:

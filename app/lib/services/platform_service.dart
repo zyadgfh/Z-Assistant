@@ -137,7 +137,7 @@ class PlatformService implements PlatformExecutor {
     }
     // Fixed script (no user text): sends the multimedia volume key.
     final key = up ? '175' : '174';
-    final script = r"(New-Object -ComObject WScript.Shell).SendKeys([char]$KEY);";
+    const script = r"(New-Object -ComObject WScript.Shell).SendKeys([char]$KEY);";
     await _runner('powershell', [
       '-NoProfile',
       '-Command',
