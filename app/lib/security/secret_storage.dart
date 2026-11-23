@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SecretStorage {
   SecretStorage(this._prefs);
 
-  final SharedPreferences _prefs;
+  final SharedPreferencesAsync _prefs;
 
   static final RegExp _credentialKeyPattern =
       RegExp(r'(api[_-]?key|secret|token|password|credential)', caseSensitive: false);
@@ -16,10 +16,13 @@ class SecretStorage {
   /// Refuses credential-like keys; returns false instead of storing anything.
   Future<bool> tryStorePublicValue(String key, String value) async {
     if (_credentialKeyPattern.hasMatch(key)) return false;
-    return _prefs.setString(key, value);
+    // SharedPreferencesAsync.setString completes with void; success means the
+    // write finished without throwing.
+    await _prefs.setString(key, value);
+    return true;
   }
 
-  String? readPublicValue(String key) => _prefs.getString(key);
+  Future<String?> readPublicValue(String key) => _prefs.getString(key);
 
   Future<void> removePublicValue(String key) => _prefs.remove(key);
 }

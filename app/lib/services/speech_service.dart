@@ -58,7 +58,7 @@ class AndroidSpeechService implements SpeechService {
 
     await _stt.listen(
       localeId: localeId,
-      partialResults: false,
+      listenOptions: SpeechListenOptions(partialResults: false),
       onResult: (result) {
         if (result.finalResult && result.recognizedWords.trim().isNotEmpty) {
           onFinal(result.recognizedWords.trim());

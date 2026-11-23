@@ -67,7 +67,7 @@ void main() {
       ai: ai,
       platform: platform,
       connectivity: connectivity,
-      confirmation: ConfirmationService(),
+      confirmationService: ConfirmationService(),
       deviceId: () => 'test-device',
     );
   });
@@ -112,7 +112,8 @@ void main() {
       requiresConfirmation: false,
       requestId: 'r2',
     );
-    await controller.handleUtterance('شغّل المتصفح الأفضل');
+    // Not matched by the deterministic parser (worker parity): no شغل/افتح/بحث forms.
+    await controller.handleUtterance('هات لي أفضل متصفح');
     expect(platform.executed, ['open_application']);
     expect(ai.asked, hasLength(1));
   });
@@ -120,7 +121,7 @@ void main() {
   test('sensitive commands wait for confirmation before executing', () async {
     await controller.handleUtterance('اقفل التطبيق كروم');
     expect(platform.executed, isEmpty, reason: 'لا تنفيذ قبل التأكيد');
-    expect(tts.spoken.join(' '), contains('تأكيد'));
+    expect(tts.spoken.join(' '), contains('تؤكد'));
 
     await controller.handleUtterance('تاكيد');
     expect(platform.executed, ['close_application']);

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../state/assistant_controller.dart';
-import '../widgets/confirmation_dialog.dart';
 import '../widgets/microphone_button.dart';
 import '../widgets/status_indicator.dart';
 

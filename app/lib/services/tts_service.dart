@@ -21,20 +21,11 @@ class AndroidTtsService implements TtsService {
   AndroidTtsService();
 
   final FlutterTts _tts = FlutterTts();
-  bool _configured = false;
-
-  Future<void> _ensureConfigured(double rate, double pitch) async {
-    if (_configured) return;
-    await _tts.setStartHandler(() {});
-    await _tts.setCancelHandler(() {});
-    _configured = true;
-  }
 
   @override
   Future<void> configure({required double rate, required double pitch}) async {
     await _tts.setSpeechRate(rate);
     await _tts.setPitch(pitch);
-    await _ensureConfigured(rate, pitch);
   }
 
   @override

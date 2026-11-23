@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'app.dart';
 import 'config/app_config.dart';
 import 'state/assistant_controller.dart';
+import 'state/backend_url.dart';
 import 'services/ai_service.dart';
 import 'services/connectivity_service.dart';
 import 'services/confirmation_service.dart';
@@ -12,13 +13,6 @@ import 'services/offline_command_service.dart';
 import 'services/platform_service.dart';
 import 'services/speech_service.dart';
 import 'services/tts_service.dart';
-
-/// Mutable holder so a backend-URL change in settings applies immediately
-/// (the URL is a public endpoint, not a secret).
-class BackendUrlHolder {
-  BackendUrlHolder(this.url);
-  String url;
-}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,7 +31,7 @@ Future<void> runAppMaya(SharedPreferencesAsync prefs) async {
     ai: AiService(backendUrl: () => backend.url),
     platform: PlatformService(),
     connectivity: PluginConnectivityService(),
-    confirmation: ConfirmationService(),
+    confirmationService: ConfirmationService(),
     deviceId: () => 'flutter-${DateTime.now().millisecondsSinceEpoch}',
   );
 

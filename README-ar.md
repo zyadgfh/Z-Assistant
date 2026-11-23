@@ -1,5 +1,7 @@
 # Maya — Z-Assistant (النسخة العربية)
 
+[![Flutter CI (app/)](https://github.com/zyadgfh/Z-Assistant/actions/workflows/flutter.yml/badge.svg)](https://github.com/zyadgfh/Z-Assistant/actions/workflows/flutter.yml)
+
 مساعد صوتي عربي أولًا لأجهزة **Windows** و**Android**، مبني بـ Flutter، ويتكلم مع
 خادم Cloudflare Worker الذي يحتفظ بمفتاح Gemini داخل السيرفر فقط. الأوامر المحلية
 المعروفة تعمل بلا إنترنت، وما لا يفهمه يذهب إلى Gemini عبر الوسيط.
@@ -48,8 +50,14 @@ flutter test                    # اختبارات Dart (الأوامر المح
 ## الحالة (بصراحة)
 
 - الخادم الوسيط: مكتمل ومُختبَر هنا (35 اختبار vitest ناجحة).
-- تطبيق Flutter: الكود والاختبارات مكتملة لكن **لم تُنفَّذ** في هذه البيئة
-  (لا يوجد Flutter/Dart SDK في بيئة العمل) — شغّل `flutter test` محليًا.
+- تطبيق Flutter: **موثّق بالبناء الفعلي على CI** — `flutter analyze` بدون أي ملاحظات،
+  `flutter test` (33 اختبارًا ناجحًا)، و`flutter build apk --debug`
+  و`flutter build windows` يترجمان بنجاح (شعار Flutter CI أعلاه).
+  بيئة العمل هنا بلا Flutter SDK، لذا ينفذ السير عمل
+  (`.github/workflows/flutter.yml`) على runners حقيقية مع كل دفع/PR.
+  للبناء المحلي على أندرويد انظر التعديلات بعد `flutter create` في
+  [docs/setup-android-ar.md](docs/setup-android-ar.md)
+  (compileSdk 36 وminSdk 24 وKotlin 2.2.0 — متطلبات flutter_tts 4.2.5).
 - التعرف الصوتي على Windows يحتاج جسرًا أصليًا (لاحقًا)؛ أندرويد يعمل عبر محركات النظام.
 - Windows Hello وكلمة التنبيه: واجهات معدّة وغير مفعلة.
 

@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/assistant_request.dart';
-import '../models/assistant_response.dart';
 import '../models/command_intent.dart';
 import '../security/permission_policy.dart';
 import '../services/ai_service.dart';
@@ -25,11 +24,9 @@ class AssistantController extends ChangeNotifier {
     required this.ai,
     required this.platform,
     required this.connectivity,
-    required this.confirmation,
+    required this.confirmationService,
     required String Function() deviceId,
-  })  : _deviceId = deviceId {
-    confirmationService = confirmation;
-  }
+  }) : _deviceId = deviceId;
 
   final SpeechService speech;
   final TtsService tts;
@@ -37,7 +34,7 @@ class AssistantController extends ChangeNotifier {
   final AiClient ai;
   final PlatformExecutor platform;
   final ConnectivityService connectivity;
-  late final ConfirmationService confirmationService;
+  final ConfirmationService confirmationService;
   final String Function() _deviceId;
   final PermissionPolicy _policy = const PermissionPolicy();
   final LanguageDetector _detector = const LanguageDetector();

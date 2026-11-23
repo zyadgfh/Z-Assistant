@@ -13,6 +13,22 @@ flutter create . --platforms=windows,android --project-name maya_assistant
 flutter run -d android
 ```
 
+## تعديلات مطلوبة بعد `flutter create` (بسبب حزمة flutter_tts 4.2.5)
+
+القالب الافتراضي لـ Flutter 3.27 أقدم من متطلبات الحزمة؛ طبّق في
+`android/app/build.gradle` و`android/settings.gradle`:
+
+```bash
+# android/app/build.gradle — داخل android { defaultConfig { ... } }
+compileSdk = 36      # بدل flutter.compileSdkVersion
+minSdk = 24          # بدل flutter.minSdkVersion
+
+# android/settings.gradle — داخل plugins { ... }
+id "org.jetbrains.kotlin.android" version "2.2.0"
+```
+
+هذه التعديلات نفسها يطبّقها سير عمل CI تلقائيًا (`.github/workflows/flutter.yml`).
+
 ## صلاحية الميكروفون
 
 أضف في `android/app/src/main/AndroidManifest.xml` (داخل `<manifest>`):
