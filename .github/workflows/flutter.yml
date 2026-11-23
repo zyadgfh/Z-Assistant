@@ -23,11 +23,26 @@ jobs:
         run: flutter pub get
         working-directory: app
       - name: Analyze
-        run: flutter analyze
         working-directory: app
+        shell: bash
+        run: set -o pipefail && flutter analyze 2>&1 | tee analyze.log
       - name: Test
-        run: flutter test
         working-directory: app
+        shell: bash
+        run: set -o pipefail && flutter test 2>&1 | tee test.log
+      - name: Report failure to PR
+        if: failure() && github.event.pull_request.number
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "❌ **Analyze/Test failed** — log tail:"
+            echo '```text'
+            tail -n 100 analyze.log 2>/dev/null
+            tail -n 100 test.log 2>/dev/null
+            echo '```'
+          } > body.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file body.md
 
   build-android:
     name: Build APK (android debug)
@@ -50,8 +65,21 @@ jobs:
         run: flutter pub get
         working-directory: app
       - name: Build debug APK
-        run: flutter build apk --debug
         working-directory: app
+        shell: bash
+        run: set -o pipefail && flutter build apk --debug 2>&1 | tee apk.log
+      - name: Report failure to PR
+        if: failure() && github.event.pull_request.number
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "❌ **Android APK build failed** — log tail:"
+            echo '```text'
+            tail -n 100 apk.log 2>/dev/null
+            echo '```'
+          } > body.md
+          gh pr comment "${{ github.event.pull_request.number }}" --body-file body.md
 
   build-windows:
     name: Build Windows exe
@@ -70,5 +98,19 @@ jobs:
         run: flutter pub get
         working-directory: app
       - name: Build Windows release
-        run: flutter build windows
         working-directory: app
+        shell: pwsh
+        run: |
+          flutter build windows 2>&1 | Tee-Object -FilePath build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Report failure to PR
+        if: failure() && github.event.pull_request.number
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: pwsh
+        run: |
+          Set-Content body.md 'Windows build failed — log tail:'
+          Add-Content body.md '```text'
+          Get-Content build.log -Tail 100 -ErrorAction SilentlyContinue | Add-Content body.md
+          Add-Content body.md '```'
+          gh pr comment ${{ github.event.pull_request.number }} --body-file body.md
