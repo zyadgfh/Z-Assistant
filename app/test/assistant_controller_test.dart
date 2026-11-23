@@ -112,7 +112,8 @@ void main() {
       requiresConfirmation: false,
       requestId: 'r2',
     );
-    await controller.handleUtterance('شغّل المتصفح الأفضل');
+    // Not matched by the deterministic parser (worker parity): no شغل/افتح/بحث forms.
+    await controller.handleUtterance('هات لي أفضل متصفح');
     expect(platform.executed, ['open_application']);
     expect(ai.asked, hasLength(1));
   });

@@ -65,7 +65,7 @@ jobs:
       - name: Generate platform folders (kept out of git, as documented)
         run: flutter create . --platforms=android --project-name maya_assistant
         working-directory: app
-      - name: Raise compileSdk to 36 and minSdk to 24 (flutter_tts requirements)
+      - name: Raise compileSdk to 36, minSdk to 24, Kotlin to 2.2.0 (flutter_tts requirements)
         working-directory: app
         run: |
           sed -i -e 's/compileSdk = flutter.compileSdkVersion/compileSdk = 36/' \
@@ -73,7 +73,9 @@ jobs:
                  -e 's/minSdk = flutter.minSdkVersion/minSdk = 24/' \
                  -e 's/minSdkVersion flutter.minSdkVersion/minSdkVersion 24/' \
                  android/app/build.gradle
+          sed -i 's/id "org.jetbrains.kotlin.android" version "[0-9.]*"/id "org.jetbrains.kotlin.android" version "2.2.0"/' android/settings.gradle
           grep -n "compileSdk\|minSdk" android/app/build.gradle
+          grep -n kotlin android/settings.gradle
       - name: Pub get
         run: flutter pub get
         working-directory: app

@@ -23,10 +23,11 @@ void main() {
     expect(calls, hasLength(1));
     expect(calls.first.first, 'powershell');
     expect(calls.first[1], '-NoProfile');
+    expect(calls.first[2], '-Command');
     // The spoken text is one argv element — never interpolated into a shell.
-    expect(calls.first[2], contains("Speak('مرحباً')"));
+    expect(calls.first[3], contains("Speak('مرحباً')"));
     // User text with quotes is escaped, keeping the script literal.
     await tts.speak("مايا's", 'ar-EG');
-    expect(calls.last[2], contains("Speak('مايا''s')"));
+    expect(calls.last[3], contains("Speak('مايا''s')"));
   });
 }
