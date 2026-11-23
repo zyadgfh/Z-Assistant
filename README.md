@@ -1,5 +1,7 @@
 # Maya — Z-Assistant
 
+[![Flutter CI (app/)](https://github.com/zyadgfh/Z-Assistant/actions/workflows/flutter.yml/badge.svg)](https://github.com/zyadgfh/Z-Assistant/actions/workflows/flutter.yml)
+
 Voice-first Arabic assistant for **Windows** and **Android**, built with Flutter and a
 Cloudflare Worker backend that keeps the Gemini API key server-side. Deterministic local
 commands work fully offline; unknown requests fall back to Gemini through the worker.
@@ -49,8 +51,14 @@ screen or via `--dart-define=MAYA_BACKEND_URL=...`.
 ## Status (honest)
 
 - Worker: fully implemented and tested here (35 vitest tests green).
-- Flutter: complete Dart source and tests written, **not executed** in this environment
-  (no Flutter/Dart SDK available in the sandbox) — run `flutter test` locally.
+- Flutter: **verified by CI on real runners** — `flutter analyze` (0 issues),
+  `flutter test` (33 tests green), `flutter build apk --debug` and
+  `flutter build windows` both compile (see the Flutter CI badge).
+  The sandbox itself has no Flutter SDK; the workflow
+  (`.github/workflows/flutter.yml`) runs on every push/PR. For local Android
+  builds note the post-`flutter create` adjustments in
+  [docs/setup-android-ar.md](docs/setup-android-ar.md)
+  (compileSdk 36, minSdk 24, Kotlin 2.2.0 — required by flutter_tts 4.2.5).
 - Windows local STT needs a native bridge (planned); Android STT/TTS work via system engines.
 - Windows Hello and wake-word service: interfaces prepared, not implemented.
 
