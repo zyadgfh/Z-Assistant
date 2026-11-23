@@ -22,7 +22,7 @@ maya_animation.gif       ← أصل شاشة البداية للنموذج ال�
 
 ```bash
 npm install
-npm test -w @maya/core        # 27 اختبارًا آليًا
+npm test -w @maya/core        # 48 اختبارًا آليًا
 npm run typecheck             # فحص الأنواع في كل الحزم
 ```
 
@@ -31,6 +31,31 @@ npm run typecheck             # فحص الأنواع في كل الحزم
 - الأوامر غير المعروفة تصبح `ai_query` — إجابة نصية فقط.
 - `shell_exec` مرفوض في الوضع الآمن، ولا يعمل إلا في وضع المطوّر المؤقت والموثق.
 - OmniRoute يرسل الحساسيات إلى السحابة فقط بعد موافقة صريحة ويفشل مغلقًا عند غيابها.
+
+### ربط الصوت المحلي (STT) — Whisper على الجهاز
+
+خط المعالجة في `packages/core/src/pipeline.ts` ينفذ فصل الخطة §4.2 بالترتيب المفروض:
+
+```text
+كلمة التنبيه «مايا» → Whisper محلي → كشف اللغة → النية → الصلاحيات → أمر للجهاز
+```
+
+- **الجهاز لا ينفذ نظام التشغيل مباشرة:** النواة تُرجع أفعالًا تصريحية `DeviceAction`
+  (فتح رابط/تطبيق/مجلد، لقطة شاشة، تشغيل أغنية، إيقاف، كلام) ينفذها عميل المنصة —
+  فتشتغل النواة نفسها على macOS وWindows وAndroid دون تعديل.
+- **`MayaPipeline.handleUtterance`** هو نقطة الدخول: صوت مسجّل في ملف مؤقت ← نص ←
+  كلمة تنبيه ← نية ← قرار صلاحيات ← أفعال أو رد عبر OmniRoute، مع سجل
+  `VoiceCommandRecord` لكل عبارة (يُخزَّن في Supabase من طرف الجهاز).
+- **`WhisperCliAdapter`** يشغّل Whisper محليًا (`faster-whisper` أو `openai-whisper`)
+  بقائمة وسائط فقط و`shell: false` — النص المنطوق لا يدخل أي أمر إطلاقًا.
+- **`stt/maya_stt.py`** سكربت مرجعي للجهاز (macOS/Windows): يقرأ ملف الصوت ويطبع JSON
+  `{text, language}` بدون أن يغادر الصوت الجهاز؛ احذف الملف المؤقت فور الانتهاء (§5.4).
+- نماذج بحسب قوة الجهاز (§4.3): `tiny/base` للضعيفة، `small` الافتراضي، `medium/large-v3` للقوية.
+
+```bash
+pip install -r stt/requirements.txt
+python stt/maya_stt.py recording.wav --model small   # → {"text": "...", "language": "ar"}
+```
 
 ### قاعدة البيانات (Supabase)
 

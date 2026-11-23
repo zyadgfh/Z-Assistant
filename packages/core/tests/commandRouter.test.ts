@@ -65,6 +65,12 @@ describe("parseCommand", () => {
     expect(parseCommand("أوقف مايا").name).toBe("stop");
   });
 
+  it("routes destructive requests to the high-risk delete_file intent", () => {
+    const intent = parseCommand("احذف الملف القديم");
+    expect(intent).toMatchObject({ name: "delete_file", risk: "high", args: { target: "القديم" } });
+    expect(parseCommand("delete file report.pdf").name).toBe("delete_file");
+  });
+
   it("falls back to ai_query for unknown text (answered, never executed)", () => {
     const intent = parseCommand("ما عاصمة اليابان؟");
     expect(intent.name).toBe("ai_query");

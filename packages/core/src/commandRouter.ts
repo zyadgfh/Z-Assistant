@@ -121,6 +121,13 @@ export function parseCommand(input: string): Intent {
     }
   }
 
+  // Destructive requests route to the high-risk tier: better to over-classify
+  // than to misfire (plan section 10 tier 6).
+  const deleteTarget = splitBy(command, ["احذف الملف", "امسح الملف", "احذف مجلد", "delete file", "احذف"]);
+  if (deleteTarget) {
+    return { name: "delete_file", args: { target: deleteTarget }, risk: "high", ...base };
+  }
+
   const folderQuery = splitBy(command, ["افتحي مجلد", "افتح مجلد", "افتحي المجلد", "افتح المجلد", "open folder"]);
   if (folderQuery) {
     return { name: "open_folder", args: { folder: folderQuery }, risk: "safe", ...base };
