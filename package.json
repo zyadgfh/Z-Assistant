@@ -1,0 +1,15 @@
+{
+  "name": "z-assistant",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Maya AI platform: shared core, OmniRoute gateway, and Next.js dashboard",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  }
+}

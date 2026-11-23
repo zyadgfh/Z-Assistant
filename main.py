@@ -178,7 +178,7 @@ def listen_command(timeout: int = 5, phrase_time: int = 8) -> str:
 
 
 def play_song(command: str) -> None:
-    match = re.search(r"(?:play|شغل|شغّل|شغل لي|شغّل لي)\s+(.+)$", command, re.IGNORECASE)
+    match = re.search(r"(?:play|شغّل لي|شغل لي|شغّل|شغل)\s+(.+)$", command, re.IGNORECASE)
     song = match.group(1).strip() if match else ""
     song = re.sub(r"^(?:song|أغنية|اغنية)\s+", "", song, flags=re.IGNORECASE)
     if not song:
