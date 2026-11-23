@@ -11,7 +11,8 @@ packages/core/           ← النواة المشتركة (TypeScript)
   └─ commandRouter       ← توجيه الأوامر العربية/الإنجليزية إلى نوايا صريحة
   └─ permissionEngine    ← ثلاث درجات خطورة: تنفيذ مباشر / بصمة صوتية / بصمة+PIN
   └─ providerRouter      ← بوابة OmniRoute: محلي أولًا + حصص + fallback آمن
-apps/dashboard/          ← لوحة Next.js (عربية RTL) للمستخدم والإدارة
+apps/device-agent/       ← عميل الجهاز المرجعي (macOS/Windows/Linux)
+apps/dashboard/          ← لوحة Next.js (عربية RTL) للمستخدم والإدارة + حلقة صوتية بالمتصفح
 supabase/migrations/     ← مرآة المهاجرات المطبقة على مشروع maya-assistant
 maya_animation.gif       ← أصل شاشة البداية للنموذج المحلي
 ```
@@ -22,8 +23,8 @@ maya_animation.gif       ← أصل شاشة البداية للنموذج ال�
 
 ```bash
 npm install
-npm test -w @maya/core        # 61 اختبارًا آليًا
-npm run typecheck             # فحص الأنواع في كل الحزم
+npm test                     # 83 اختبارًا آليًا (النواة + عميل الجهاز)
+npm run typecheck            # فحص الأنواع في كل الحزم
 ```
 
 قواعد النواة الثابتة:
@@ -106,6 +107,41 @@ npm run dev -w @maya/dashboard   # http://localhost:3000
 - `/api/health` — فحص الجاهزية.
 
 المفاتيح العامة (Publishable) فقط تصل للمتصفح؛ كل الوصول محمي بـ RLS.
+
+## عميل الجهاز المرجعي — `apps/device-agent`
+
+المرحلة 1 من الخطة (§11): عميل سطح مكتب يحول أفعال النواة التصريحية إلى أوامر نظام
+حقيقية — **بقوائم وسائط فقط وبدون shell**، وكل تعيين منصة مغطى باختبار:
+
+| الفعل | macOS | Windows | Linux |
+|---|---|---|---|
+| فتح تطبيق | `open -a` | PowerShell `Start-Process` | `xdg-open` |
+| فتح رابط | `open` | `rundll32 url.dll` | `xdg-open` |
+| لقطة شاشة | `screencapture -x` | PowerShell + System.Drawing | `gnome-screenshot` |
+| نطق الرد | `say` | PowerShell System.Speech | `spd-say` |
+| تسجيل الصوت | `rec` (sox) أو ffmpeg | ffmpeg dshow | `arecord` |
+
+التشغيل (push-to-talk):
+
+```bash
+export NEXT_PUBLIC_SUPABASE_URL=... NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+export MAYA_ACCESS_TOKEN=<رمز جلسة Supabase من لوحة المستخدم>
+npm start -w @maya/device-agent
+```
+
+- يسجل الجهاز في جدول `devices` ويحدث `last_seen_at`، ويكتب كل دور في `voice_commands`
+  (النص فقط بعد موافقة صريحة)، والملف الصوتي يُحذف فور التحويل (§5.4).
+- قول «مايا، أوقف مايا» لإيقاف نظيف. بدون `MAYA_ACCESS_TOKEN` يعمل محليًا دون مزامنة.
+
+## مايا الصوتية في المتصفح — `/console`
+
+زر «🎤 تحدث إلى مايا» يعمل فورًا في Chrome/Edge دون أي تثبيت:
+
+- التعرف الصوتي **داخل المتصفح** (Web Speech API) — الصوت لا يُرفع للخادم.
+- كل قرار من النواة عبر `/api/command`: كلمة التنبيه ← نية ← صلاحيات.
+- الويب ينفذ الآمن فقط (فتح الروابط، نطق الردود)، و`open_application` وغيره يعود
+  للجهاز عبر `deviceActions` — الويب لا ينفذ عمليات نظام أبدًا.
+- سجل الأوامر يُخزن في Supabase بجلسة المستخدم وRLS.
 
 ## النشر على Vercel
 

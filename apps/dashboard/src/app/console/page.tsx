@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { SignInCard, useSession } from "@/components/auth";
+import { VoiceLoop } from "@/components/voiceLoop";
 import { getSupabase } from "@/lib/supabase";
 
 interface VoiceCommand {
@@ -220,6 +221,8 @@ export default function ConsolePage() {
           </p>
         )}
       </section>
+
+      <VoiceLoop />
 
       <section className="card mt-6">
         <h2 className="font-bold">آخر الأوامر الصوتية</h2>
