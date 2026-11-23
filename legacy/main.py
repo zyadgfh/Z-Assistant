@@ -24,7 +24,7 @@ import pywhatkit
 import speech_recognition as sr
 
 BASE_DIR = Path(__file__).resolve().parent
-GIF_PATH = BASE_DIR / "maya_animation.gif"
+GIF_PATH = BASE_DIR.parent / "assets" / "maya_animation.gif"
 SCREENSHOTS_DIR = BASE_DIR / "screenshots"
 OLLAMA_MODEL = os.getenv("MAYA_OLLAMA_MODEL", "llama3")
 RECOGNITION_LANGUAGES = ("ar-SA", "en-US")
