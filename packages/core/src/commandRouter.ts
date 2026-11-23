@@ -6,7 +6,7 @@
  * Unknown requests become `ai_query` so the model layer can answer as text only.
  */
 
-import type { Intent } from "./types.js";
+import type { Intent } from "./types";
 
 /** Strip Arabic diacritics (tashkeel) and normalize letters, then casefold. */
 export function normalizeCommand(text: string): string {

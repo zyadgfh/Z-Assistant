@@ -10,12 +10,12 @@
  * the same auditable core drives every device.
  */
 
-import { decide } from "./permissionEngine.js";
-import { parseCommand } from "./commandRouter.js";
-import { extractAfterWakeWord } from "./speech.js";
-import type { AudioUtterance } from "./speech.js";
-import type { Intent, PermissionDecision, ProviderRequest } from "./types.js";
-import type { OmniRouteGateway } from "./providerRouter.js";
+import { decide } from "./permissionEngine";
+import { parseCommand } from "./commandRouter";
+import { extractAfterWakeWord } from "./speech";
+import type { AudioUtterance } from "./speech";
+import type { Intent, PermissionDecision, ProviderRequest } from "./types";
+import type { OmniRouteGateway } from "./providerRouter";
 
 export type DeviceAction =
   | { kind: "open_url"; url: string; label: string }
@@ -110,7 +110,7 @@ export function planActions(intent: Intent): DeviceAction[] {
 }
 
 export interface MayaPipelineDeps {
-  stt: import("./speech.js").SpeechToText;
+  stt: import("./speech").SpeechToText;
   gateway: OmniRouteGateway;
   sink?: VoiceCommandSink | undefined;
 }

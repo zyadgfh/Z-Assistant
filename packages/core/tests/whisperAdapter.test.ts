@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { WhisperCliAdapter, cleanWhisperOutput } from "../src/whisperAdapter.js";
+import { WhisperCliAdapter, cleanWhisperOutput } from "../src/whisperAdapter";
 
 describe("cleanWhisperOutput", () => {
   it("strips timestamps and status lines", () => {

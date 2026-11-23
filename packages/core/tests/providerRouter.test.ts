@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { GeminiAdapter, LocalModelAdapter, OmniRouteGateway, QuotaTracker } from "../src/providerRouter.js";
-import type { ProviderRequest } from "../src/types.js";
+import { GeminiAdapter, LocalModelAdapter, OmniRouteGateway, QuotaTracker } from "../src/providerRouter";
+import type { ProviderRequest } from "../src/types";
 
 const safeRequest: ProviderRequest = { prompt: "hello", sensitivity: "safe", locale: "en" };
 const sensitiveRequest: ProviderRequest = { prompt: "private note", sensitivity: "sensitive", locale: "ar" };

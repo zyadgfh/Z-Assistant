@@ -22,7 +22,7 @@ maya_animation.gif       ← أصل شاشة البداية للنموذج ال�
 
 ```bash
 npm install
-npm test -w @maya/core        # 48 اختبارًا آليًا
+npm test -w @maya/core        # 61 اختبارًا آليًا
 npm run typecheck             # فحص الأنواع في كل الحزم
 ```
 
@@ -31,6 +31,27 @@ npm run typecheck             # فحص الأنواع في كل الحزم
 - الأوامر غير المعروفة تصبح `ai_query` — إجابة نصية فقط.
 - `shell_exec` مرفوض في الوضع الآمن، ولا يعمل إلا في وضع المطوّر المؤقت والموثق.
 - OmniRoute يرسل الحساسيات إلى السحابة فقط بعد موافقة صريحة ويفشل مغلقًا عند غيابها.
+
+### مزود Gemini الحقيقي — `packages/core/src/geminiClient.ts`
+
+عميل كامل لواجهة Gemini REST (`POST /v1beta/models/{model}:generateContent`):
+
+- النموذج الافتراضي `gemini-2.5-flash` وقابل للتغيير (`gemini-2.5-flash-lite`، `gemini-3.0-flash`...).
+- تصنيف كامل للأخطاء برسائل عربية: نفاد الحصة (429)، مفتاح غير صالح، حجب الأمان، فشل الشبكة، مهلة الطلب.
+- **prompt الحارس** الافتراضي يمنع النموذج من ادعاء تنفيذ أفعال على الجهاز (نفس قاعدة `main.py`).
+- تكامل كامل مع البوابة: عند 429 أو نفاد السقف المحلي أو غياب المفتاح يعود النظام للنموذج المحلي تلقائيًا دون إعادة لانهائية.
+- المفتاح يُدخل من بيئة المضيف فقط — لا يُكتب في المستودع ولا يصل للمتصفح.
+
+```ts
+const gateway = new OmniRouteGateway({
+  adapters: [new GeminiClient({ apiKey: process.env.GEMINI_API_KEY }), new LocalModelAdapter()],
+});
+const reply = await gateway.route({ prompt, sensitivity: "safe", locale: "ar" });
+```
+
+في اللوحة: مسار الخادم `/api/ai` يستخدم `GeminiClient` من جانب الخادم فقط، وصندوق
+«اسأل مايا» في `/console` يجيب عبره. لتفعيله على Vercel أضف متغير البيئة
+`GEMINI_API_KEY` (نوع Secret) ثم أعد النشر — وبدونه يظهر شرح الإعداد بدل انهيار الطلب.
 
 ### ربط الصوت المحلي (STT) — Whisper على الجهاز
 

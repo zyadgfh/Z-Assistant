@@ -10,7 +10,7 @@
  *  5. No infinite retries: each adapter is tried once, in priority order.
  */
 
-import type { ModelAdapter, ProviderReply, ProviderRequest } from "./types.js";
+import type { ModelAdapter, ProviderReply, ProviderRequest } from "./types";
 
 /** Deterministic quota tracker with local ceilings per provider. */
 export class QuotaTracker {

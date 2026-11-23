@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { decide } from "../src/permissionEngine.js";
-import { parseCommand } from "../src/commandRouter.js";
+import { decide } from "../src/permissionEngine";
+import { parseCommand } from "../src/commandRouter";
 
 describe("permissionEngine", () => {
   it("executes safe intents directly", () => {

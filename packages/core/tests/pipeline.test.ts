@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { MayaPipeline, buildGoogleSearchUrl, buildYoutubeSearchUrl } from "../src/pipeline.js";
-import type { DeviceAction, VoiceCommandRecord, VoiceCommandSink } from "../src/pipeline.js";
-import { OmniRouteGateway } from "../src/providerRouter.js";
-import { LocalModelAdapter } from "../src/providerRouter.js";
-import type { AudioUtterance, SpeechToText, TranscriptionResult } from "../src/speech.js";
+import { MayaPipeline, buildGoogleSearchUrl, buildYoutubeSearchUrl } from "../src/pipeline";
+import type { DeviceAction, VoiceCommandRecord, VoiceCommandSink } from "../src/pipeline";
+import { OmniRouteGateway } from "../src/providerRouter";
+import { LocalModelAdapter } from "../src/providerRouter";
+import type { AudioUtterance, SpeechToText, TranscriptionResult } from "../src/speech";
 
 function fakeStt(text: string): SpeechToText {
   return {

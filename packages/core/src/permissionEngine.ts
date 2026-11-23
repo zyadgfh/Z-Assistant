@@ -10,7 +10,7 @@
  * which is explicit, temporary, and audited.
  */
 
-import type { CommandContext, Intent, PermissionDecision } from "./types.js";
+import type { CommandContext, Intent, PermissionDecision } from "./types";
 
 type Policy = {
   requirement: PermissionDecision["requirement"];

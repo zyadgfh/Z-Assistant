@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isArabic, normalizeCommand, parseCommand } from "../src/commandRouter.js";
+import { isArabic, normalizeCommand, parseCommand } from "../src/commandRouter";
 
 describe("normalizeCommand", () => {
   it("strips tashkeel so «شغّل» matches «شغل»", () => {

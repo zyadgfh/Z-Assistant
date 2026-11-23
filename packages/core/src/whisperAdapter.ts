@@ -12,8 +12,8 @@
  * (tiny/base → weak devices, small → ordinary, medium/large → powerful).
  */
 
-import { detectSpokenLanguage } from "./speech.js";
-import type { AudioUtterance, SpeechToText, TranscriptionResult } from "./speech.js";
+import { detectSpokenLanguage } from "./speech";
+import type { AudioUtterance, SpeechToText, TranscriptionResult } from "./speech";
 
 export type CliRunner = (
   file: string,

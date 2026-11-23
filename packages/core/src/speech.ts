@@ -10,7 +10,7 @@
  * after transcription; this layer never persists audio.
  */
 
-import { isArabic, normalizeCommand } from "./commandRouter.js";
+import { isArabic, normalizeCommand } from "./commandRouter";
 
 export type SpokenLanguage = "ar" | "en" | "unknown";
 

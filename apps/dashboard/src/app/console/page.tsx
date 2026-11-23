@@ -46,6 +46,9 @@ export default function ConsolePage() {
   const [settings, setSettings] = useState<Settings | null>(null);
   const [savingSettings, setSavingSettings] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState<{ text: string; error?: boolean } | null>(null);
+  const [asking, setAsking] = useState(false);
 
   const load = useCallback(async () => {
     const supabase = getSupabase();
@@ -86,6 +89,30 @@ export default function ConsolePage() {
     });
     setSavingSettings(false);
     if (!error) setSavedAt(new Date().toLocaleTimeString("ar-EG"));
+  }
+
+  async function askMaya(event: React.FormEvent) {
+    event.preventDefault();
+    if (!question.trim() || asking) return;
+    setAsking(true);
+    setAnswer(null);
+    try {
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: question }),
+      });
+      const data = (await response.json()) as { reply?: string; error?: string };
+      setAnswer(
+        data.reply
+          ? { text: data.reply }
+          : { text: data.error ?? "حدث خطأ غير متوقع.", error: true },
+      );
+    } catch {
+      setAnswer({ text: "تعذر الاتصال بالخادم.", error: true });
+    } finally {
+      setAsking(false);
+    }
   }
 
   if (!session) {
@@ -168,6 +195,30 @@ export default function ConsolePage() {
             <p className="mt-3 text-sm text-neutral-400">جارٍ تحميل الإعدادات...</p>
           )}
         </div>
+      </section>
+
+      <section className="card mt-6">
+        <h2 className="font-bold">اسأل مايا سؤالًا</h2>
+        <p className="mt-1 text-xs text-neutral-500">
+          يمر السؤال عبر بوابة OmniRoute إلى Gemini على الخادم — المفتاح لا يصل للمتصفح، ومايا تجيب فقط ولا تدّعي تنفيذ أفعال على الجهاز.
+        </p>
+        <form onSubmit={askMaya} className="mt-3 flex flex-col gap-2 sm:flex-row">
+          <input
+            className="input"
+            placeholder="مثال: ما عاصمة اليابان؟"
+            value={question}
+            maxLength={500}
+            onChange={(e) => setQuestion(e.target.value)}
+          />
+          <button type="submit" className="btn btn-primary" disabled={asking}>
+            {asking ? "مايا تفكر..." : "اسأل"}
+          </button>
+        </form>
+        {answer && (
+          <p className={`mt-3 rounded-lg bg-neutral-900 px-3 py-2 text-sm leading-6 ${answer.error ? "text-red-400" : "text-neutral-200"}`}>
+            {answer.text}
+          </p>
+        )}
       </section>
 
       <section className="card mt-6">

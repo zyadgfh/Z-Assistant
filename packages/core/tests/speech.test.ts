@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detectSpokenLanguage, extractAfterWakeWord } from "../src/speech.js";
+import { detectSpokenLanguage, extractAfterWakeWord } from "../src/speech";
 
 describe("extractAfterWakeWord", () => {
   it("strips the wake word and returns the command", () => {
