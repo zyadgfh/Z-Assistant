@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 
 import '../models/assistant_request.dart';
-import '../models/assistant_response.dart';
 import '../models/command_intent.dart';
 import '../security/permission_policy.dart';
 import '../services/ai_service.dart';

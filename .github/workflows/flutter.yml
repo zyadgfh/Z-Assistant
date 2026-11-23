@@ -42,8 +42,8 @@ jobs:
           {
             echo "❌ **Analyze/Test failed** — log tail:"
             echo '```text'
-            tail -n 100 analyze.log 2>/dev/null
-            tail -n 100 test.log 2>/dev/null
+            tail -n 100 app/analyze.log 2>/dev/null
+            tail -n 100 app/test.log 2>/dev/null
             echo '```'
           } > body.md
           gh pr comment "${{ github.event.pull_request.number }}" --body-file body.md
@@ -80,7 +80,7 @@ jobs:
           {
             echo "❌ **Android APK build failed** — log tail:"
             echo '```text'
-            tail -n 100 apk.log 2>/dev/null
+            tail -n 100 app/apk.log 2>/dev/null
             echo '```'
           } > body.md
           gh pr comment "${{ github.event.pull_request.number }}" --body-file body.md
@@ -115,6 +115,6 @@ jobs:
         run: |
           Set-Content body.md 'Windows build failed — log tail:'
           Add-Content body.md '```text'
-          Get-Content build.log -Tail 100 -ErrorAction SilentlyContinue | Add-Content body.md
+          Get-Content app/build.log -Tail 100 -ErrorAction SilentlyContinue | Add-Content body.md
           Add-Content body.md '```'
           gh pr comment ${{ github.event.pull_request.number }} --body-file body.md
