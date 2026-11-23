@@ -67,7 +67,7 @@ void main() {
       ai: ai,
       platform: platform,
       connectivity: connectivity,
-      confirmation: ConfirmationService(),
+      confirmationService: ConfirmationService(),
       deviceId: () => 'test-device',
     );
   });

@@ -16,7 +16,10 @@ class SecretStorage {
   /// Refuses credential-like keys; returns false instead of storing anything.
   Future<bool> tryStorePublicValue(String key, String value) async {
     if (_credentialKeyPattern.hasMatch(key)) return false;
-    return _prefs.setString(key, value);
+    // SharedPreferencesAsync.setString completes with void; success means the
+    // write finished without throwing.
+    await _prefs.setString(key, value);
+    return true;
   }
 
   Future<String?> readPublicValue(String key) => _prefs.getString(key);

@@ -65,6 +65,13 @@ jobs:
       - name: Generate platform folders (kept out of git, as documented)
         run: flutter create . --platforms=android --project-name maya_assistant
         working-directory: app
+      - name: Raise compileSdk to 36 (flutter_tts requirement)
+        working-directory: app
+        run: |
+          sed -i -e 's/compileSdk = flutter.compileSdkVersion/compileSdk = 36/' \
+                 -e 's/compileSdkVersion flutter.compileSdkVersion/compileSdkVersion 36/' \
+                 android/app/build.gradle
+          grep -n compileSdk android/app/build.gradle
       - name: Pub get
         run: flutter pub get
         working-directory: app
@@ -87,7 +94,7 @@ jobs:
 
   build-windows:
     name: Build Windows exe
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2

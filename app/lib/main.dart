@@ -31,7 +31,7 @@ Future<void> runAppMaya(SharedPreferencesAsync prefs) async {
     ai: AiService(backendUrl: () => backend.url),
     platform: PlatformService(),
     connectivity: PluginConnectivityService(),
-    confirmation: ConfirmationService(),
+    confirmationService: ConfirmationService(),
     deviceId: () => 'flutter-${DateTime.now().millisecondsSinceEpoch}',
   );
 
