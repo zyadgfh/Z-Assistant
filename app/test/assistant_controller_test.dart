@@ -120,7 +120,7 @@ void main() {
   test('sensitive commands wait for confirmation before executing', () async {
     await controller.handleUtterance('اقفل التطبيق كروم');
     expect(platform.executed, isEmpty, reason: 'لا تنفيذ قبل التأكيد');
-    expect(tts.spoken.join(' '), contains('تأكيد'));
+    expect(tts.spoken.join(' '), contains('تؤكد'));
 
     await controller.handleUtterance('تاكيد');
     expect(platform.executed, ['close_application']);

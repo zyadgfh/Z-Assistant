@@ -24,8 +24,9 @@ void main() {
 
   test('mixed Arabic/English resolves to Arabic (Arabic letters dominate)', () {
     final result = detector.detect('ابحث في جوجل عن flutter tutorial');
-    expect(result.locale, MayaLocale.egyptian, reason: '«ابحث» ليس مصريًا لكن العربية هي الأساس');
-    expect(result.replyLanguage, startsWith('ar'));
+    expect(result.locale, MayaLocale.arabicMsa,
+        reason: 'لا يوجد مؤشر مصري — العربية هي الأساس والرد يبقى عربيًا');
+    expect(result.replyLanguage, 'ar');
   });
 
   test('empty text falls back to Arabic defaults', () {

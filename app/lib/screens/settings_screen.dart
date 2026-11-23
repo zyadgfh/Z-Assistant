@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/app_config.dart';
-import '../main.dart' show BackendUrlHolder;
 import '../security/secret_storage.dart';
+import '../state/backend_url.dart';
 
 /// Settings: language, TTS, backend URL (public), autostart, history deletion.
 class SettingsScreen extends StatefulWidget {

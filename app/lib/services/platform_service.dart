@@ -30,7 +30,6 @@ class PlatformService implements PlatformExecutor {
   final Future<bool> Function(Uri, {LaunchMode mode}) launcher;
 
   bool get _isWindows => defaultTargetPlatform == TargetPlatform.windows;
-  bool get _isAndroid => defaultTargetPlatform == TargetPlatform.android;
 
   @override
   Future<ExecutionResult> execute(CommandIntent intent) async {
@@ -76,10 +75,19 @@ class PlatformService implements PlatformExecutor {
   Future<ExecutionResult> _openApplication(CommandIntent intent) async {
     final app = intent.arguments['application'] ?? '';
     if (_isWindows) {
+      // Canonical display names map to executable names registered in the
+      // Windows "App Paths" registry; unknown names pass through unchanged.
+      final exeByApp = {
+        'Google Chrome': 'chrome.exe',
+        'VS Code': 'code.exe',
+        'WhatsApp': 'whatsapp.exe',
+        'Telegram': 'telegram.exe',
+      };
+      final exe = exeByApp[app] ?? app;
       await _runner('powershell', [
         '-NoProfile',
         '-Command',
-        "Start-Process '${escapePowerShellSingleQuoted(app)}'",
+        "Start-Process '${escapePowerShellSingleQuoted(exe)}'",
       ]);
       return ExecutionResult(true, 'حاولت فتح $app.');
     }

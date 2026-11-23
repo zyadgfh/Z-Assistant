@@ -8,7 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SecretStorage {
   SecretStorage(this._prefs);
 
-  final SharedPreferences _prefs;
+  final SharedPreferencesAsync _prefs;
 
   static final RegExp _credentialKeyPattern =
       RegExp(r'(api[_-]?key|secret|token|password|credential)', caseSensitive: false);
@@ -19,7 +19,7 @@ class SecretStorage {
     return _prefs.setString(key, value);
   }
 
-  String? readPublicValue(String key) => _prefs.getString(key);
+  Future<String?> readPublicValue(String key) => _prefs.getString(key);
 
   Future<void> removePublicValue(String key) => _prefs.remove(key);
 }

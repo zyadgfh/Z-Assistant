@@ -37,7 +37,8 @@ class LanguageDetector {
     final hasLatin = _hasLatinLetters(text);
 
     if (!hasArabic && !hasLatin) {
-      return const LanguageDetection(MayaLocale.arabicMsa, 'ar-EG');
+      // Empty or non-letter input: default to the Egyptian reply variety.
+      return const LanguageDetection(MayaLocale.egyptian, 'ar-EG');
     }
     if (hasArabic) {
       final normalized = _normalize(text);
