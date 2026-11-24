@@ -26,6 +26,8 @@
 cd backend/cloudflare-worker && npm install && npx vitest run
 cp wrangler.toml.example wrangler.toml   # عدّل ALLOWED_ORIGINS
 npx wrangler secret put GEMINI_API_KEY && npm run deploy
+# أو النشر الآلي: اضبط سرّي GitHub ثم
+#   gh workflow run deploy-worker.yml   (docs/security-audit-ar.md §4)
 
 # تطبيق Flutter (ولّد مجلدات المنصة مرة واحدة — لا تُرفع في Git)
 cd app

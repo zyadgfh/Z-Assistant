@@ -1,0 +1,65 @@
+name: Deploy Cloudflare Worker
+
+# The real wrangler.toml is generated on the runner only — the security test
+# forbids it landing in the repository (docs/security-audit-ar.md SEC rules).
+# Required repo secrets (set once, from YOUR terminal — never paste in chat):
+#   gh secret set CLOUDFLARE_API_TOKEN  --repo zyadgfh/Z-Assistant
+#   gh secret set GEMINI_API_KEY        --repo zyadgfh/Z-Assistant
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['backend/cloudflare-worker/**']
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Install worker dependencies
+        run: npm ci
+        working-directory: backend/cloudflare-worker
+      - name: Typecheck + tests before deploy
+        run: |
+          npm run typecheck
+          npm test
+        working-directory: backend/cloudflare-worker
+      - name: Generate wrangler.toml with production origins
+        working-directory: backend/cloudflare-worker
+        run: |
+          sed 's#https://your-domain.example#https://maya-dashboard-livid.vercel.app,https://maya-dashboard-zyadgams-projects.vercel.app#' \
+            wrangler.toml.example > wrangler.toml
+          echo "--- effective wrangler.toml ---"
+          cat wrangler.toml
+      - name: Put Gemini secret (skipped when the repo secret is absent)
+        working-directory: backend/cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "GEMINI_API_KEY secret not set — deploy will report aiConfigured:false"
+            exit 0
+          fi
+          printf '%s' "$GEMINI_API_KEY" | npx wrangler secret put GEMINI_API_KEY
+      - name: Deploy (skips until CLOUDFLARE_API_TOKEN secret exists)
+        working-directory: backend/cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # NOTE: secrets are not usable inside `if:` — the guard lives in the script.
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "CLOUDFLARE_API_TOKEN secret not set — skipping deploy."
+            echo "Set it from your terminal: gh secret set CLOUDFLARE_API_TOKEN --repo zyadgfh/Z-Assistant"
+            exit 0
+          fi
+          npx wrangler deploy
