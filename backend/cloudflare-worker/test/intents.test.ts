@@ -83,6 +83,16 @@ describe("deterministic intent parser", () => {
     expect(validateArgs("delete_file", { path: "report.pdf" })).toEqual({ path: "report.pdf" });
   });
 
+  it("allows only http(s) scheme for URLs (never file:/javascript:/intent:)", () => {
+    expect(validateArgs("open_url", { site: "javascript:alert(1)" })).toBeNull();
+    expect(validateArgs("open_url", { site: "file:///C:/Windows/System32" })).toBeNull();
+    expect(validateArgs("open_url", { site: "intent://evil#Intent" })).toBeNull();
+    expect(validateArgs("open_url", { site: "https://www.youtube.com" })).toEqual({
+      site: "https://www.youtube.com",
+    });
+    expect(validateArgs("open_url", { site: "http://example.com/page" })).toEqual({ site: "http://example.com/page" });
+  });
+
   it("builds Egyptian replies for deterministic intents", () => {
     const intent = parseIntent("افتحلي كروم");
     expect(replyFor(intent!)).toContain("هفتح Google Chrome");

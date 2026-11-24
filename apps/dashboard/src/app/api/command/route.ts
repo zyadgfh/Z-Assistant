@@ -13,6 +13,8 @@ import {
 import type { DeviceAction } from "@maya/core";
 import { GeminiClient } from "@maya/core";
 
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
+
 /**
  * The web tier of the Maya pipeline: text in (typed or browser-transcribed
  * voice) -> core router -> permission engine -> web-executable actions.
@@ -33,9 +35,18 @@ interface CommandBody {
 }
 
 const MAX_TEXT_LENGTH = 300;
+// Per-instance ceiling; deterministic intents are cheap but Gemini calls are not.
+const RATE_LIMIT = { limit: 120, windowMs: 60 * 60 * 1000 };
 
 export async function POST(request: Request) {
   const started = Date.now();
+  const rate = checkRateLimit(request, RATE_LIMIT);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: "تجاوزت حد الطلبات لهذه الساعة؛ جرب لاحقًا." },
+      { status: 429, headers: rateLimitHeaders(rate) },
+    );
+  }
 
   let body: CommandBody;
   try {

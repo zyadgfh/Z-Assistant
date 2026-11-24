@@ -1,0 +1,55 @@
+name: Node CI (root workspaces + worker)
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-audit:
+    name: Tests + dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Install root workspaces
+        run: npm ci
+      - name: Dependency audit (fails on high/critical)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Root workspace tests (core + device-agent)
+        run: npm test
+      - name: Worker install
+        run: npm ci
+        working-directory: backend/cloudflare-worker
+      - name: Worker audit
+        run: npm audit --omit=dev --audit-level=high
+        working-directory: backend/cloudflare-worker
+      - name: Worker typecheck
+        run: npm run typecheck
+        working-directory: backend/cloudflare-worker
+      - name: Worker tests (incl. security scans)
+        run: npm test
+        working-directory: backend/cloudflare-worker
+
+  dashboard-build:
+    name: Dashboard build (Next.js)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        working-directory: apps/dashboard
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-key-for-build

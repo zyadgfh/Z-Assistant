@@ -68,6 +68,7 @@ export function validateArgs(name: string, args: Record<string, unknown>): Recor
     const value_ = value.trim().slice(0, 200);
     if (!value_) continue;
     if (key === "path" && /[*?;"'`$&|<>]/.test(value_)) return null; // no wildcards/quotes in paths
+    if (key === "site" && !/^https?:\/\/[^\s]+$/i.test(value_)) return null; // http(s) URLs only — never file:/javascript:/intent:
     clean[key] = value_;
   }
   return clean;
