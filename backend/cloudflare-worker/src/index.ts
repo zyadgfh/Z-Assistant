@@ -41,11 +41,6 @@ function getLimiter(env: Env): DailyRateLimiter {
   return cachedLimiter.limiter;
 }
 
-function rateLimiter(env: Env): DailyRateLimiter {
-  const limit = Number.parseInt(env.DAILY_REQUEST_LIMIT ?? "200", 10);
-  return new DailyRateLimiter(Number.isFinite(limit) && limit > 0 ? limit : 200);
-}
-
 function rateHeaders(state: { limit: number; remaining: number; resetAt: string }): Record<string, string> {
   return {
     "X-RateLimit-Limit": String(state.limit),

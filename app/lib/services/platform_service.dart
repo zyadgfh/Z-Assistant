@@ -65,7 +65,10 @@ class PlatformService implements PlatformExecutor {
             ? 'https://www.google.com/search?q=${Uri.encodeQueryComponent(intent.arguments['query'] ?? '')}'
             : 'https://www.youtube.com/results?search_query=${Uri.encodeQueryComponent(intent.arguments['query'] ?? '')}');
     final uri = Uri.tryParse(url);
-    if (uri == null) return const ExecutionResult(false, 'رابط غير صالح.');
+    // Defense in depth with the worker: only http(s) ever reaches the launcher.
+    if (uri == null || (uri.scheme != 'https' && uri.scheme != 'http')) {
+      return const ExecutionResult(false, 'الرابط غير مسموح؛ يُفتح فقط http وhttps.');
+    }
     final ok = await launcher(uri, mode: LaunchMode.externalApplication);
     return ok
         ? const ExecutionResult(true, 'تم فتح الرابط.')
@@ -75,15 +78,21 @@ class PlatformService implements PlatformExecutor {
   Future<ExecutionResult> _openApplication(CommandIntent intent) async {
     final app = intent.arguments['application'] ?? '';
     if (_isWindows) {
-      // Canonical display names map to executable names registered in the
-      // Windows "App Paths" registry; unknown names pass through unchanged.
-      final exeByApp = {
+      // Launch allowlist: canonical display names map to executables registered
+      // in Windows "App Paths". Anything outside the allowlist is refused so the
+      // model can never start arbitrary programs (cmd, powershell, installers…).
+      const exeByApp = {
         'Google Chrome': 'chrome.exe',
         'VS Code': 'code.exe',
         'WhatsApp': 'whatsapp.exe',
         'Telegram': 'telegram.exe',
+        'Notepad': 'notepad.exe',
+        'Calculator': 'calculator.exe',
       };
-      final exe = exeByApp[app] ?? app;
+      final exe = exeByApp[app];
+      if (exe == null) {
+        return ExecutionResult(false, 'التطبيق "$app" ليس في قائمة التشغيل المسموحة.');
+      }
       await _runner('powershell', [
         '-NoProfile',
         '-Command',

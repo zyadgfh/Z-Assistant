@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { GeminiClient, MAYA_GUARD_SYSTEM_PROMPT } from "@maya/core";
 import { OmniRouteGateway } from "@maya/core";
 
+import { checkRateLimit, rateLimitHeaders } from "@/lib/rateLimit";
+
 /**
  * Server-side AI route — the only place where GEMINI_API_KEY exists.
  * The key is read from the server environment (Vercel env vars) and is never
@@ -11,8 +13,18 @@ import { OmniRouteGateway } from "@maya/core";
  * execution (plan sections 2.4 and 10).
  */
 const MAX_PROMPT_LENGTH = 500;
+// Per-instance ceiling against Gemini cost abuse while the route is unauthenticated.
+const RATE_LIMIT = { limit: 30, windowMs: 60 * 60 * 1000 };
 
 export async function POST(request: Request) {
+  const rate = checkRateLimit(request, RATE_LIMIT);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { error: "تجاوزت حد استخدام الذكاء الاصطناعي لهذه الساعة؛ جرب لاحقًا." },
+      { status: 429, headers: rateLimitHeaders(rate) },
+    );
+  }
+
   let prompt = "";
   try {
     const body = (await request.json()) as { prompt?: unknown };
