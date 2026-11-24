@@ -28,6 +28,8 @@ commands work fully offline; unknown requests fall back to Gemini through the wo
 cd backend/cloudflare-worker && npm install && npx vitest run
 cp wrangler.toml.example wrangler.toml   # edit ALLOWED_ORIGINS
 npx wrangler secret put GEMINI_API_KEY && npm run deploy
+# Or automated deploy: set the two GitHub secrets, then
+#   gh workflow run deploy-worker.yml   (see docs/security-audit-ar.md §4)
 
 # Flutter app (generate platform folders once — they are not committed)
 cd app

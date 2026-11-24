@@ -74,16 +74,33 @@
 
 ---
 
-## 4) تدقيق Cloudflare — قائمة تحقق تشغيلية (لا يمكن قياسها من بيئة الفحص)
+## 4) تدقيق Cloudflare — التنفيذ الفعلي + قائمة تحقق تشغيلية
 
-الـ Worker لم يُنشر بعد على حسابك، ولا توجد بيانات دخول Cloudflare في النطاق. عند النشر راجع:
+**ما نُفّذ فعليًا:**
+- ✅ إعداد النشر آليًا: `.github/workflows/deploy-worker.yml` يولّد `wrangler.toml` على الـ runner فقط (لا يلمس المستودع — يفرضه اختبار الأمن) بنطاقات الإنتاج الحقيقية
+  (`maya-dashboard-livid.vercel.app`, `maya-dashboard-zyadgams-projects.vercel.app` + localhost للتطوير)، ويشغّل typecheck + الاختبارات قبل النشر، ويثبّت `GEMINI_API_KEY` كـ Cloudflare Secret.
+- ✅ تحقق تكوين النشر بـ `wrangler deploy --dry-run`: الحزمة 26.32 KiB والربطيات (ALLOWED_ORIGINS/DAILY_REQUEST_LIMIT/GEMINI_MODEL) صحيحة.
+- ✅ لوحة التحكم (Vercel) أعيد نشرها للإنتاج بتشغيل إصلاحات الأمان (SEC-001…004 + رؤوس الأمان + تحديد المعدل): deployment `dpl_9J1kLSrQUFL9xTQ66Tt65pVUyxXw` من commit `2f47eb4`.
+
+**الخطوة الوحيدة المتبقية عليك (من طرفك — لا تلصق أي سر في الشات):**
+```bash
+# 1) أنشئ توكن من لوحة Cloudflare: My Profile → API Tokens → قالب "Edit Cloudflare Workers"
+#    (صلاحيات: Workers Scripts: Edit) ثم في طرفيتك المحلية:
+gh secret set CLOUDFLARE_API_TOKEN --repo zyadgfh/Z-Assistant
+gh secret set GEMINI_API_KEY    --repo zyadgfh/Z-Assistant
+# 2) شغّل النشر:
+gh workflow run deploy-worker.yml --repo zyadgfh/Z-Assistant
+# 3) تحقق: GET https://maya-assistant-worker.<subdomain>.workers.dev/health → aiConfigured:true
+```
+
+**بقية عناصر القائمة التشغيلية (لوحة Cloudflare — لمرة واحدة بعد النشر):**
 1. **SSL/TLS:** وضع Full (Strict)، Always Use HTTPS، TLS ≥1.2.
 2. **WAF:** تفعيل Managed Ruleset + Rate Limiting على `/v1/assistant` (مثلًا 60/دقيقة/IP) فوق حد التطبيق.
 3. **Bot Fight Mode** + Challenge عند هجمات ملاحظة (لا تفعل Under Attack دائمًا مع عملاء API).
 4. **DNS:** إخفاء IP الأصلي إن وُجد خادم أصلي، وSPF/DKIM/DMARC لنطاق البريد.
 5. **Zero Trust Access** على أي لوحة إدارة أو `/health` إن أردت إخفاء حاله.
 6. **API Tokens:** مبدأ أقل صلاحية (توكن النشر للـ Worker فقط، دوري التدوير)، وSecrets عبر `wrangler secret put` فقط.
-7. كود `wrangler.toml.example` يفرض `ALLOWED_ORIGINS` دون `*` — اجعلها نطاقاتك الفعلية.
+7. كود `wrangler.toml.example` يفرض `ALLOWED_ORIGINS` دون `*` — النطاقات الفعلية مضبوطة الآن في سير النشر.
 
 ## 5) مطابقة ECC (NCA ECC-1:2018) — تقريبية على مستوى الضوابط
 
