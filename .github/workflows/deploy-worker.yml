@@ -50,11 +50,16 @@ jobs:
             exit 0
           fi
           printf '%s' "$GEMINI_API_KEY" | npx wrangler secret put GEMINI_API_KEY
-      - name: Deploy
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: backend/cloudflare-worker
-          command: deploy
+      - name: Deploy (skips until CLOUDFLARE_API_TOKEN secret exists)
+        working-directory: backend/cloudflare-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # NOTE: secrets are not usable inside `if:` — the guard lives in the script.
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "CLOUDFLARE_API_TOKEN secret not set — skipping deploy."
+            echo "Set it from your terminal: gh secret set CLOUDFLARE_API_TOKEN --repo zyadgfh/Z-Assistant"
+            exit 0
+          fi
+          npx wrangler deploy
